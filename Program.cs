@@ -16,15 +16,6 @@ namespace MANIFESTA
     {
         private readonly ITelegramBotClient botClient = new TelegramBotClient("6558637896:AAFn-y5PLNvv_BfQhJEyhEWOPGItg3GCBX4");
         private static KeyboardStateManager _keyboardStateManager = new();
-
-        private readonly string[] sites = { "Google", "Github", "Telegram", "Wikipedia" };
-        private readonly string[] siteDescriptions =
-        {
-    "Google is a search engine",
-    "Github is a git repository hosting",
-    "Telegram is a messenger",
-    "Wikipedia is an open wiki"
-};
         public async Task Run(string[] args)
         {
 
@@ -65,18 +56,31 @@ namespace MANIFESTA
             // Only process text messages
             if (message.Text is not { } messageText)
                 return;
+            if (update.Message is { Text: { } messageTextt })
+            {
+                if (messageText == "Юр. послуги")
+                {
+                    // Отправляем текст с информацией о юридических услугах
+                    var legalServicesText = "Мы предоставляем широкий спектр юридических услуг...";
+                    await bot.SendTextMessageAsync(update.Message.Chat.Id, legalServicesText, cancellationToken: ct);
+                }
+            }
 
             var chatId = message.Chat.Id;
             var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
             if (messageText == "Наші послуги")
             {
-                _keyboardStateManager.ShowSubmenu(); // Показываем подменю
-                currentKeyboard = _keyboardStateManager.GetCurrentKeyboard(); // Получаем новое состояние клавиатуры
-                currentKeyboard = _keyboardStateManager.Reset();
+                _keyboardStateManager.ShowSubmenu();
+                currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
+            }
+            else if (messageText == "Назад")
+            {
+                _keyboardStateManager.HideSubmenu();
+                currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
             }
             Message sentMessaage = await bot.SendTextMessageAsync(
             chatId: chatId,
-            text: "Оберіть що вас цікавить",
+            text: null,
             replyMarkup: currentKeyboard,
             cancellationToken: ct);
 
