@@ -7,6 +7,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using MANIFESTA;
 using Telegram.Bot.Types.InlineQueryResults;
 using System.Threading;
+using System;
 
 namespace MANIFESTA
 {
@@ -49,24 +50,37 @@ namespace MANIFESTA
         }
 
         private static async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken ct)
-        {
-            
+        {           
             if (update.Message is not { } message)
                 return;
             // Only process text messages
             if (message.Text is not { } messageText)
                 return;
+            var chatId = message.Chat.Id;
             if (update.Message is { Text: { } messageTextt })
             {
                 if (messageText == "Юр. послуги")
                 {
-                    // Отправляем текст с информацией о юридических услугах
-                    var legalServicesText = "Мы предоставляем широкий спектр юридических услуг...";
-                    await bot.SendTextMessageAsync(update.Message.Chat.Id, legalServicesText, cancellationToken: ct);
+                    // HTML-formatted text with a link to the image
+                    var legalServicesText = "<b>Юридические услуги</b>\n" +
+                                            "<i>Предоставляем широкий спектр юридических услуг...</i>\n" +
+                                            "<a href=\"https://example.com\">Подробнее</a>";
+
+                    // Send the formatted text message with HTML parse mode
+                    await bot.SendTextMessageAsync(update.Message.Chat.Id, legalServicesText, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, cancellationToken: ct);
+
+                    // Send the image as a separate message
+                    var imageUrl = "https://example.com/image.jpg"; // Replace with the actual image URL
+                    await bot.SendPhotoAsync(
+    chatId: chatId,
+    photo: InputFile.FromUri("https://github.com/TelegramBots/book/raw/master/src/docs/photo-ara.jpg"),
+    caption: "<b>Ara bird</b>. <i>Source</i>: <a href=\"https://pixabay.com\">Pixabay</a>",
+    parseMode: ParseMode.Html,
+    cancellationToken: ct);
                 }
             }
 
-            var chatId = message.Chat.Id;
+           
             var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
             if (messageText == "Наші послуги")
             {
@@ -80,7 +94,7 @@ namespace MANIFESTA
             }
             Message sentMessaage = await bot.SendTextMessageAsync(
             chatId: chatId,
-            text: null,
+            text: "Оберіть що вас цікавить",
             replyMarkup: currentKeyboard,
             cancellationToken: ct);
 

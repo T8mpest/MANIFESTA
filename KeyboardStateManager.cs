@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
+using Telegram.Bot;
 
 namespace MANIFESTA
 {
@@ -56,6 +57,7 @@ namespace MANIFESTA
         new[]
         {
             new KeyboardButton("Залишити заявку☎️") { RequestContact = true },
+            
         },
     });
         }
@@ -76,10 +78,10 @@ namespace MANIFESTA
         },
         new[]
         {
-            new KeyboardButton("Назад") { RequestContact = false },
-            
+            new KeyboardButton("Назад") { RequestContact = false },           
         },
     });
+            
         }
     }
 }
