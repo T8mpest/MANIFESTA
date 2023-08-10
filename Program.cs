@@ -70,10 +70,10 @@ namespace MANIFESTA
                     await bot.SendTextMessageAsync(update.Message.Chat.Id, legalServicesText, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, cancellationToken: ct);
 
                     // Send the image as a separate message
-                    var imageUrl = "https://example.com/image.jpg"; // Replace with the actual image URL
+                    var imageUrl = "https://github.com/T8mpest/MANIFESTA/blob/main/img/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202023-08-10%20192015.png"; // Replace with the actual image URL
                     await bot.SendPhotoAsync(
     chatId: chatId,
-    photo: InputFile.FromUri("https://github.com/TelegramBots/book/raw/master/src/docs/photo-ara.jpg"),
+    photo: InputFile.FromUri("https://github.com/T8mpest/MANIFESTA/blob/main/img/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202023-08-10%20192015.png"),
     caption: "<b>Ara bird</b>. <i>Source</i>: <a href=\"https://pixabay.com\">Pixabay</a>",
     parseMode: ParseMode.Html,
     cancellationToken: ct);
