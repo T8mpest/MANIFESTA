@@ -6,6 +6,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using MANIFESTA;
 using Telegram.Bot.Types.InlineQueryResults;
+using System.Threading;
 
 namespace MANIFESTA
 {
@@ -13,8 +14,9 @@ namespace MANIFESTA
 
     internal class Program
     {
-        private readonly ITelegramBotClient botClient = new TelegramBotClient("6558637896:AAFn-y5PLNvv_BfQhJEyhEWOPGItg3GCBX4");      
-        private static InlineProccesor _inlineProcessor;
+        private readonly ITelegramBotClient botClient = new TelegramBotClient("6558637896:AAFn-y5PLNvv_BfQhJEyhEWOPGItg3GCBX4");
+        private static KeyboardStateManager _keyboardStateManager = new();
+
         private readonly string[] sites = { "Google", "Github", "Telegram", "Wikipedia" };
         private readonly string[] siteDescriptions =
         {
@@ -24,13 +26,13 @@ namespace MANIFESTA
     "Wikipedia is an open wiki"
 };
         public async Task Run(string[] args)
-        {           
-            
-            _inlineProcessor = new InlineProccesor();
+        {
+
+
             var me = await botClient.GetMeAsync();
             ReceiverOptions receiverOptions = new()
             {
-                AllowedUpdates = Array.Empty<UpdateType>() // receive all update types except ChatMember related updates
+                AllowedUpdates = Array.Empty<Telegram.Bot.Types.Enums.UpdateType>() // receive all update types except ChatMember related updates
             };
             using var cts = new CancellationTokenSource();
             botClient.StartReceiving(HandleUpdateAsync, HandlePollingErrorAsync, receiverOptions, cts.Token);
@@ -41,33 +43,42 @@ namespace MANIFESTA
 
         }
 
-
-         async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken ct)
+        public Task HandlePollingErrorAsync(ITelegramBotClient client, Exception ex, CancellationToken token)
         {
-            try
+            var ErrorMessage = ex switch
             {
-                // ANCHOR: switch-statement
-                await (update.Type switch
-                {
-                    UpdateType.InlineQuery => BotOnInlineQueryReceived(bot, update.InlineQuery!),
-                    UpdateType.ChosenInlineResult => BotOnChosenInlineResultReceived(bot, update.ChosenInlineResult!),
-                    UpdateType.Message => HandleMessageUpdate(bot, update.Message, ct!), // Добавьте эту строку
-                    _ => Task.CompletedTask // Добавьте это для обработки остальных случаев
-                });
-                // ANCHOR_END: switch-statement
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception while handling {update.Type}: {ex}");
-            }
+                ApiRequestException apiRequestException
+                    => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+                _ => ex.ToString()
+            };
 
+
+            Console.WriteLine(ErrorMessage);
+            return Task.CompletedTask;
         }
-        static async Task HandleMessageUpdate(ITelegramBotClient bot, Message message, CancellationToken ct)
+
+        private static async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken ct)
         {
-            if (message is not { Text: { } messageText }) // Проверка на наличие текста в сообщении
+            
+            if (update.Message is not { } message)
+                return;
+            // Only process text messages
+            if (message.Text is not { } messageText)
                 return;
 
             var chatId = message.Chat.Id;
+            var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
+            if (messageText == "Наші послуги")
+            {
+                _keyboardStateManager.ShowSubmenu(); // Показываем подменю
+                currentKeyboard = _keyboardStateManager.GetCurrentKeyboard(); // Получаем новое состояние клавиатуры
+                currentKeyboard = _keyboardStateManager.Reset();
+            }
+            Message sentMessaage = await bot.SendTextMessageAsync(
+            chatId: chatId,
+            text: "Оберіть що вас цікавить",
+            replyMarkup: currentKeyboard,
+            cancellationToken: ct);
 
             Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
 
@@ -84,66 +95,33 @@ namespace MANIFESTA
                 replyMarkup: inlineKeyboard,
                 cancellationToken: ct);
 
-            ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
-            {
-        new KeyboardButton("Наші послуги"),
-        new KeyboardButton("Прайси"),
-        KeyboardButton.WithRequestContact("Залишити заявку☎️"),
-    });
+            //ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
+            //{
+            //   // new KeyboardButton("Наші послуги"),
+            //   // new KeyboardButton("Прайси"),
+            //    KeyboardButton.WithRequestContact("Залишити заявку☎️"),
+            //});
 
-            Message ssentMessage = await bot.SendTextMessageAsync(
-                chatId: chatId,
-                text: "Оберіть що вас цікавить",
-                replyMarkup: replyKeyboardMarkup,
-                cancellationToken: ct);
+            //Message ssentMessage = await bot.SendTextMessageAsync(
+            //    chatId: chatId,
+            //    text: "Оберіть що вас цікавить",
+            //    replyMarkup: replyKeyboardMarkup,
+            //    cancellationToken: ct);
+            //Console.WriteLine(
+            //$"{message.From.FirstName} sent message {message.MessageId} " +
+            //$"to chat {message.Chat.Id} at {message.Date.ToLocalTime}. " +
+            //    $"It is a reply to message {message.ReplyToMessage?.MessageId} " +
+            //    $"and has {message.Entities?.Length ?? 0} message entities.");
 
-            Console.WriteLine(
-                $"{message.From.FirstName} sent message {message.MessageId} " +
-                $"to chat {message.Chat.Id} at {message.Date.ToLocalTime}. " +
-                $"It is a reply to message {message.ReplyToMessage?.MessageId} " +
-                $"and has {message.Entities?.Length ?? 0} message entities.");
-        }
-        async Task BotOnInlineQueryReceived(ITelegramBotClient bot, Telegram.Bot.Types.InlineQuery inlineQuery)
-        {
-            var results = new List<InlineQueryResult>();
-
-            var counter = 0;
-            foreach (var site in sites)
-            {
-                results.Add(new InlineQueryResultArticle(
-                    $"{counter}", // we use the counter as an id for inline query results
-                    site, // inline query result title
-                    new InputTextMessageContent(siteDescriptions[counter])) // content that is submitted when the inline query result title is clicked
-                );
-                counter++;
-            }
-
-            await bot.AnswerInlineQueryAsync(inlineQuery.Id, results); // answer by sending the inline query result list
-        }
-        Task BotOnChosenInlineResultReceived(ITelegramBotClient bot, ChosenInlineResult chosenInlineResult)
-        {
-            if (uint.TryParse(chosenInlineResult.ResultId, out var resultId) // check if a result id is parsable and introduce variable
-                && resultId < sites.Length)
-            {
-                Console.WriteLine($"User {chosenInlineResult.From} has selected site: {sites[resultId]}");
-            }
-
-            return Task.CompletedTask;
         }
 
-          Task HandlePollingErrorAsync(ITelegramBotClient bot, Exception ex, CancellationToken ct)
-        {
-            var ErrorMessage = ex switch
-            {
-                ApiRequestException apiRequestException
-                    => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
-                _ => ex.ToString()
-            };
 
-            Console.WriteLine(ErrorMessage);
-            return Task.CompletedTask;
-        }
+
     }
+
+
 }
+
+
 
 
