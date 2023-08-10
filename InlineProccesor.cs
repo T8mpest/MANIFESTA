@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bots.Types;
 
 namespace MANIFESTA
 {
     internal class InlineProccesor
     {
+
 
         private readonly string[] sites = { "Google", "Github", "Telegram", "Wikipedia" };
         private readonly string[] siteDescriptions =
@@ -22,6 +24,7 @@ namespace MANIFESTA
 };
         public async Task BotOnInlineQueryReceived(ITelegramBotClient bot, InlineQuery inlineQuery)
         {
+            
             var results = new List<InlineQueryResult>();
 
             var counter = 0;
