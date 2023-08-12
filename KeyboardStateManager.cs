@@ -73,7 +73,7 @@ namespace MANIFESTA
         },
         new[]
         {
-            new KeyboardButton("Бух. послуги") { RequestContact = false },
+            new KeyboardButton("Бух.Послуги") { RequestContact = false },
             new KeyboardButton("Управлінський облік") { RequestContact = false },
         },
         new[]

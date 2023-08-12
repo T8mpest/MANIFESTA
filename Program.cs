@@ -49,7 +49,7 @@ namespace MANIFESTA
         }
 
         private static async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken ct)
-        {           
+        {
             if (update.Message is not { } message)
                 return;
             // Only process text messages
@@ -59,7 +59,7 @@ namespace MANIFESTA
             if (update.Message is { Text: { } messageTextt })
             {
                 if (messageText == "Юридичні.послуги")
-                { 
+                {
                     // HTML-formatted text with a link to the image
                     var legalServicesText = "<b>Юридичні послуги</b>\n" +
                                             " <b>1. Договори, контракти: </b> розробка договорів, контрактів, зокрема ЗЕД, угод, оцінка ризиків, коригування, підготовка протоколів розбіжностей," +
@@ -84,19 +84,45 @@ namespace MANIFESTA
 
                     // Send the formatted text message with HTML parse mode
                     await bot.SendTextMessageAsync(update.Message.Chat.Id, legalServicesText, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, cancellationToken: ct);
-
-                    // Send the image as a separate message
-                    //var imageUrl = "https://github.com/T8mpest/MANIFESTA/blob/main/img/1u.png"; // Replace with the actual image URL
-    //                await bot.SendPhotoAsync(
-    //chatId: chatId,
-    //photo: InputFile.FromUri("https://github.com/T8mpest/MANIFESTA/blob/d4379ceed963ff73fa6171ba4a77ee8ac2be2ad3/img/1u.png"),
-    //caption: "<b>Ara bird</b>. <i>Source</i>: <a href=\"https://pixabay.com\">Pixabay</a>",
-    //parseMode: ParseMode.Html,
-    //cancellationToken: ct);
                 }
+                else if (messageText == "Бізнес Аналітика")
+                {
+                    var legalServicesText = "<b>Бізнес Аналітика</b>\n" + // условно
+                                            " НАЛАГОДЖЕННЯ ТА РОЗРОБКА BAS ";
+                    await bot.SendMediaGroupAsync(
+                     chatId: chatId,
+                      media: new IAlbumInputMedia[]
+                      {
+                          new InputMediaPhoto(
+                            InputFile.FromString("https://imgur.com/5VXtIcU")),
+                           new InputMediaPhoto(
+                             InputFile.FromString("https://imgur.com/BdoOhTo")),
+                           new InputMediaPhoto(
+                               InputFile.FromString("https://imgur.com/KqpGHDi"))
+                      },
+                            cancellationToken: ct);
+                    //await bot.SendPhotoAsync(update.Message.Chat.Id,InputFile.FromString("https://imgur.com/a/52f6Qkn"), allowSendingWithoutReply: true, cancellationToken: ct);
+                }
+                else if (messageText == "Бух.Послуги")
+                {
+                    await bot.SendPhotoAsync(update.Message.Chat.Id, InputFile.FromString("https://imgur.com/TtZMndX"), allowSendingWithoutReply: true, cancellationToken: ct);
+                }
+                else if (messageText == "Управлінський облік")
+                {
+                    await bot.SendPhotoAsync(update.Message.Chat.Id, InputFile.FromString("https://imgur.com/5eEglRY"), allowSendingWithoutReply: true, cancellationToken: ct);
+                }
+                else if (update.Message?.Contact != null)
+                {
+                    var targetChatId = -1001911805891; // Замініть на ID вашої групи
+                    var contact = update.Message.Contact;
+                    var messageId = update.Message.MessageId;
+
+                    await bot.ForwardMessageAsync(targetChatId, update.Message.Chat.Id, messageId);
+                }
+
             }
 
-           
+
             var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
             if (messageText == "Наші послуги")
             {
