@@ -111,14 +111,14 @@ namespace MANIFESTA
                 {
                     await bot.SendPhotoAsync(update.Message.Chat.Id, InputFile.FromString("https://imgur.com/5eEglRY"), allowSendingWithoutReply: true, cancellationToken: ct);
                 }
-                else if (update.Message?.Contact != null)
-                {
-                    var targetChatId = -1001911805891; // Замініть на ID вашої групи
-                    var contact = update.Message.Contact;
-                    var messageId = update.Message.MessageId;
+                //else if (update.Message?.Contact != null)
+                //{
+                //    var targetChatId = -1001911805891; // нарушает правила телеграмма(
+                //    var contact = update.Message.Contact;
+                //    var messageId = update.Message.MessageId;
 
-                    await bot.ForwardMessageAsync(targetChatId, update.Message.Chat.Id, messageId);
-                }
+                //    await bot.ForwardMessageAsync(targetChatId, update.Message.Chat.Id, messageId);
+                //}
 
             }
 
