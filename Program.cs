@@ -140,7 +140,7 @@ namespace MANIFESTA
 
             Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
 
-            if (instagramMessageSentCount < 1)
+            if (instagramMessageSentCount <= 1)
             {
                 
                 InlineKeyboardMarkup inlineKeyboard = new(new[]
