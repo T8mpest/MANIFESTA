@@ -48,16 +48,17 @@ namespace MANIFESTA
 
         private ReplyKeyboardMarkup GetMainKeyboard()
         {
+            
             return new ReplyKeyboardMarkup(new[]
     {
         new[]
         {
-            new KeyboardButton("Наші послуги") { RequestContact = false },
+            new KeyboardButton("Наші послуги🐣") { RequestContact = false },
         },
         new[]
         {
             new KeyboardButton("Залишити заявку☎️") { RequestContact = true },
-            
+
         },
     });
         }
@@ -68,17 +69,17 @@ namespace MANIFESTA
      {
         new[]
         {
-            new KeyboardButton("Бізнес Аналітика") { RequestContact = false },
-            new KeyboardButton("Юридичні.послуги") { RequestContact = false },
+            new KeyboardButton("Бізнес Аналітика🏅") { RequestContact = false },
+            new KeyboardButton("Юридичні.послуги🔮") { RequestContact = false },
         },
         new[]
         {
-            new KeyboardButton("Бух.Послуги") { RequestContact = false },
-            new KeyboardButton("Управлінський облік") { RequestContact = false },
+            new KeyboardButton("Бух.Послуги🌸") { RequestContact = false },
+            new KeyboardButton("Управлінський облік🐍") { RequestContact = false },
         },
         new[]
         {
-            new KeyboardButton("Назад") { RequestContact = false },           
+            new KeyboardButton("Назад⏎") { RequestContact = false },           
         },
     });
             

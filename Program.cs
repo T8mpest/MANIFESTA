@@ -17,6 +17,7 @@ namespace MANIFESTA
     {
         private readonly ITelegramBotClient botClient = new TelegramBotClient("6558637896:AAFn-y5PLNvv_BfQhJEyhEWOPGItg3GCBX4");
         private static KeyboardStateManager _keyboardStateManager = new();
+        private static int instagramMessageSentCount = 0;
         public async Task Run(string[] args)
         {
 
@@ -58,7 +59,7 @@ namespace MANIFESTA
             var chatId = message.Chat.Id;
             if (update.Message is { Text: { } messageTextt })
             {
-                if (messageText == "Юридичні.послуги")
+                if (messageText == "Юридичні.послуги🔮")
                 {
                     // HTML-formatted text with a link to the image
                     var legalServicesText = "<b>Юридичні послуги</b>\n" +
@@ -84,8 +85,9 @@ namespace MANIFESTA
 
                     // Send the formatted text message with HTML parse mode
                     await bot.SendTextMessageAsync(update.Message.Chat.Id, legalServicesText, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, cancellationToken: ct);
+                    instagramMessageSentCount++;
                 }
-                else if (messageText == "Бізнес Аналітика")
+                else if (messageText == "Бізнес Аналітика🏅")
                 {
                     var legalServicesText = "<b>Бізнес Аналітика</b>\n" + // условно
                                             " НАЛАГОДЖЕННЯ ТА РОЗРОБКА BAS ";
@@ -101,38 +103,34 @@ namespace MANIFESTA
                                InputFile.FromString("https://imgur.com/KqpGHDi"))
                       },
                             cancellationToken: ct);
+                    instagramMessageSentCount++;
                     //await bot.SendPhotoAsync(update.Message.Chat.Id,InputFile.FromString("https://imgur.com/a/52f6Qkn"), allowSendingWithoutReply: true, cancellationToken: ct);
                 }
-                else if (messageText == "Бух.Послуги")
+                else if (messageText == "Бух.Послуги🌸")
                 {
+                    instagramMessageSentCount++;
                     await bot.SendPhotoAsync(update.Message.Chat.Id, InputFile.FromString("https://imgur.com/TtZMndX"), allowSendingWithoutReply: true, cancellationToken: ct);
                 }
-                else if (messageText == "Управлінський облік")
+                else if (messageText == "Управлінський облік🐍")
                 {
+                    instagramMessageSentCount++;
                     await bot.SendPhotoAsync(update.Message.Chat.Id, InputFile.FromString("https://imgur.com/5eEglRY"), allowSendingWithoutReply: true, cancellationToken: ct);
                 }
-                //else if (update.Message?.Contact != null)
-                //{
-                //    var targetChatId = -1001911805891; // нарушает правила телеграмма(
-                //    var contact = update.Message.Contact;
-                //    var messageId = update.Message.MessageId;
-
-                //    await bot.ForwardMessageAsync(targetChatId, update.Message.Chat.Id, messageId);
-                //}
 
             }
 
 
             var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
-            if (messageText == "Наші послуги")
+            if (messageText == "Наші послуги🐣")
             {
                 _keyboardStateManager.ShowSubmenu();
                 currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
             }
-            else if (messageText == "Назад")
+            else if (messageText == "Назад⏎")
             {
                 _keyboardStateManager.HideSubmenu();
                 currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
+                instagramMessageSentCount++;
             }
             Message sentMessaage = await bot.SendTextMessageAsync(
             chatId: chatId,
@@ -142,44 +140,45 @@ namespace MANIFESTA
 
             Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
 
-            InlineKeyboardMarkup inlineKeyboard = new(new[]
+            if (instagramMessageSentCount < 1)
             {
-        InlineKeyboardButton.WithUrl(
-            text: "Check our Inst:",
-            url: "https://www.instagram.com/manifesta_consult/")
-    });
+                
+                InlineKeyboardMarkup inlineKeyboard = new(new[]
+                {
+                InlineKeyboardButton.WithUrl(
+                    text: "Check our Inst:",
+                    url: "https://www.instagram.com/manifesta_consult/")
+            });
 
-            Message sentMessage = await bot.SendTextMessageAsync(
-                chatId: chatId,
-                text: "Ще більше інформації:",
-                replyMarkup: inlineKeyboard,
-                cancellationToken: ct);
+                Message sentMessage = await bot.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: "Ще більше інформації:",
+                    replyMarkup: inlineKeyboard,
+                    cancellationToken: ct);               
+                instagramMessageSentCount++;
+            }
+            else if(instagramMessageSentCount == 4) {
+                InlineKeyboardMarkup inlineKeyboard = new(new[]
+                {
+                InlineKeyboardButton.WithUrl(
+                    text: "Check our Inst:",
+                    url: "https://www.instagram.com/manifesta_consult/")
+            });
 
-            //ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
-            //{
-            //   // new KeyboardButton("Наші послуги"),
-            //   // new KeyboardButton("Прайси"),
-            //    KeyboardButton.WithRequestContact("Залишити заявку☎️"),
-            //});
+                Message sentMessage = await bot.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: "Ще більше інформації:",
+                    replyMarkup: inlineKeyboard,
+                    cancellationToken: ct);
+                instagramMessageSentCount++;
+            }
 
-            //Message ssentMessage = await bot.SendTextMessageAsync(
-            //    chatId: chatId,
-            //    text: "Оберіть що вас цікавить",
-            //    replyMarkup: replyKeyboardMarkup,
-            //    cancellationToken: ct);
-            //Console.WriteLine(
-            //$"{message.From.FirstName} sent message {message.MessageId} " +
-            //$"to chat {message.Chat.Id} at {message.Date.ToLocalTime}. " +
-            //    $"It is a reply to message {message.ReplyToMessage?.MessageId} " +
-            //    $"and has {message.Entities?.Length ?? 0} message entities.");
 
         }
 
 
 
     }
-
-
 }
 
 
