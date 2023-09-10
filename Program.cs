@@ -18,6 +18,7 @@ namespace MANIFESTA
         private readonly ITelegramBotClient botClient = new TelegramBotClient("6558637896:AAFn-y5PLNvv_BfQhJEyhEWOPGItg3GCBX4");
         private static KeyboardStateManager _keyboardStateManager = new();
         private static int instagramMessageSentCount = 0;
+        private static int flag = 0;
         public async Task Run(string[] args)
         {
 
@@ -116,11 +117,47 @@ namespace MANIFESTA
                     instagramMessageSentCount++;
                     await bot.SendPhotoAsync(update.Message.Chat.Id, InputFile.FromString("https://imgur.com/5eEglRY"), allowSendingWithoutReply: true, cancellationToken: ct);
                 }
+                else if (messageText == "Аналітика🏅")
+                {
+                    _keyboardStateManager.SetCurrentState(BotState.State.WaitingForContact);
+                    flag = 1;
+                    //var phoneNumber = update.Message.Contact.PhoneNumber;
+                    //await bot.SendTextMessageAsync(chatId: chatId, text: $"Пользователь поделился контактом:\nНомер телефона: {phoneNumber}");
+                   //Console.WriteLine(phoneNumber + "POSHELNAHUI");
+                    //await bot.SendTextMessageAsync(chatId: 676712896, text: $"Пользователь поделился контактом:\nНомер телефона: {phoneNumber}");
 
+                }
+            }
+            //if (flag == 1)
+            //{
+            //    var phoneNumber = update.Message.Contact.PhoneNumber;
+            //    await bot.SendTextMessageAsync(chatId: chatId, text: $"Пользователь поделился контактом:\nНомер телефона: {phoneNumber}");
+            //    Console.WriteLine(phoneNumber + "POSHELNAHUI");
+            //    flag = 0;
+            //}
+            if (message.Contact != null && _keyboardStateManager.GetCurrentState() == BotState.State.WaitingForContact)
+            {
+                string contactName = message.Contact.FirstName;
+                string phoneNumber = message.Contact.PhoneNumber;
+                string firstName = message.Contact.FirstName;
+
+                await bot.SendContactAsync(chatId: chatId, phoneNumber, firstName);
+
+                // Извлекаем информацию о контакте
+               
+                // Выполняем логику с полученной информацией
+                await bot.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: $"Вы поделились контактом:\nИмя: {contactName}\nНомер телефона: {phoneNumber}",
+                    cancellationToken: ct);
+
+                // Возвращаемся в состояние "Idle" (если у вас есть управление состояниями)
+                _keyboardStateManager.SetCurrentState(BotState.State.Idle);
             }
 
 
-            var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
+
+                var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
             if (messageText == "Наші послуги🐣")
             {
                 _keyboardStateManager.ShowSubmenu();
@@ -132,6 +169,12 @@ namespace MANIFESTA
                 currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
                 instagramMessageSentCount++;
             }
+            else if (messageText == "Залишити заявку☎️")
+            {
+                _keyboardStateManager.ShowContactmenu();
+                currentKeyboard = _keyboardStateManager.GetContactKeyboard2();
+                await bot.SendTextMessageAsync(update.Message.Chat.Id, "Натисніть кнопку щоб поділитися контактом");
+            }
             Message sentMessaage = await bot.SendTextMessageAsync(
             chatId: chatId,
             text: "Оберіть що вас цікавить",
@@ -142,7 +185,7 @@ namespace MANIFESTA
 
             if (instagramMessageSentCount <= 1)
             {
-                
+
                 InlineKeyboardMarkup inlineKeyboard = new(new[]
                 {
                 InlineKeyboardButton.WithUrl(
@@ -154,10 +197,11 @@ namespace MANIFESTA
                     chatId: chatId,
                     text: "Ще більше інформації:",
                     replyMarkup: inlineKeyboard,
-                    cancellationToken: ct);               
+                    cancellationToken: ct);
                 instagramMessageSentCount++;
             }
-            else if(instagramMessageSentCount == 4) {
+            else if (instagramMessageSentCount == 4)
+            {
                 InlineKeyboardMarkup inlineKeyboard = new(new[]
                 {
                 InlineKeyboardButton.WithUrl(
@@ -180,6 +224,7 @@ namespace MANIFESTA
 
     }
 }
+
 
 
 

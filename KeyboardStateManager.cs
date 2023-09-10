@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot;
+using System.Net.Http.Headers;
 
 namespace MANIFESTA
 {
@@ -12,7 +13,20 @@ namespace MANIFESTA
     {
         private ReplyKeyboardMarkup _mainKeyboard;
         private ReplyKeyboardMarkup _submenuKeyboard;
+        private ReplyKeyboardMarkup _ContactKeyboard;
         private bool _showSubmenu;
+        private bool _showContactmenu;
+        private BotState.State currentState;
+
+        public void SetCurrentState(BotState.State state)
+        {
+            currentState = state;
+        }
+
+        public BotState.State GetCurrentState()
+        {
+            return currentState;
+        }
 
         public KeyboardStateManager()
         {
@@ -24,6 +38,7 @@ namespace MANIFESTA
         {
             _mainKeyboard = GetMainKeyboard();
             _submenuKeyboard = GetSubmenuKeyboard();
+            _ContactKeyboard = GetContactKeyboard();
         }
 
         public void Reset()
@@ -35,6 +50,14 @@ namespace MANIFESTA
         {
             _showSubmenu = true;
         }
+        public void ShowContactmenu()
+        {
+            _showContactmenu = true;
+        }
+        public void HideContactMenu()
+        {
+            _showContactmenu = false;
+        }
 
         public void HideSubmenu()
         {
@@ -45,10 +68,14 @@ namespace MANIFESTA
         {
             return _showSubmenu ? _submenuKeyboard : _mainKeyboard;
         }
+        public ReplyKeyboardMarkup GetContactKeyboard2()
+        {
+            return _showContactmenu ? _ContactKeyboard : _mainKeyboard;
+        }
 
         private ReplyKeyboardMarkup GetMainKeyboard()
         {
-            
+
             return new ReplyKeyboardMarkup(new[]
     {
         new[]
@@ -57,12 +84,31 @@ namespace MANIFESTA
         },
         new[]
         {
-            new KeyboardButton("Залишити заявку☎️") { RequestContact = true },
+            new KeyboardButton("Залишити заявку☎️") { RequestContact = false },
 
         },
     });
         }
-
+        private ReplyKeyboardMarkup GetContactKeyboard()
+        {
+            return new ReplyKeyboardMarkup(new[]
+            {
+ new[]
+        {
+            new KeyboardButton("Аналітика🏅") { RequestContact = true },
+            new KeyboardButton("Юридичні🔮") { RequestContact = true },
+        },
+        new[]
+        {
+            new KeyboardButton("Бухгалтерські🌸") { RequestContact = true },
+            new KeyboardButton("Управлінські🐍") { RequestContact = true },
+        },
+        new[]
+        {
+            new KeyboardButton("Назад⏎") { RequestContact = false },
+        },
+            });;
+        }
         private ReplyKeyboardMarkup GetSubmenuKeyboard()
         {
             return new ReplyKeyboardMarkup(new[]
@@ -79,10 +125,10 @@ namespace MANIFESTA
         },
         new[]
         {
-            new KeyboardButton("Назад⏎") { RequestContact = false },           
+            new KeyboardButton("Назад⏎") { RequestContact = false },
         },
     });
-            
+
         }
     }
 }
