@@ -119,13 +119,17 @@ namespace MANIFESTA
                 }
                 else if (messageText == "Аналітика🏅")
                 {
-                    _keyboardStateManager.SetCurrentState(BotState.State.WaitingForContact);
+                    
                     flag = 1;
                     //var phoneNumber = update.Message.Contact.PhoneNumber;
                     //await bot.SendTextMessageAsync(chatId: chatId, text: $"Пользователь поделился контактом:\nНомер телефона: {phoneNumber}");
                    //Console.WriteLine(phoneNumber + "POSHELNAHUI");
                     //await bot.SendTextMessageAsync(chatId: 676712896, text: $"Пользователь поделился контактом:\nНомер телефона: {phoneNumber}");
 
+                }
+                if (update.Message.Contact != null)
+                {
+                    Console.WriteLine($"Phone number: {update.Message.Contact.PhoneNumber}");
                 }
             }
             //if (flag == 1)
@@ -135,29 +139,12 @@ namespace MANIFESTA
             //    Console.WriteLine(phoneNumber + "POSHELNAHUI");
             //    flag = 0;
             //}
-            if (message.Contact != null && _keyboardStateManager.GetCurrentState() == BotState.State.WaitingForContact)
-            {
-                string contactName = message.Contact.FirstName;
-                string phoneNumber = message.Contact.PhoneNumber;
-                string firstName = message.Contact.FirstName;
 
-                await bot.SendContactAsync(chatId: chatId, phoneNumber, firstName);
-
-                // Извлекаем информацию о контакте
-               
-                // Выполняем логику с полученной информацией
-                await bot.SendTextMessageAsync(
-                    chatId: message.Chat.Id,
-                    text: $"Вы поделились контактом:\nИмя: {contactName}\nНомер телефона: {phoneNumber}",
-                    cancellationToken: ct);
-
-                // Возвращаемся в состояние "Idle" (если у вас есть управление состояниями)
-                _keyboardStateManager.SetCurrentState(BotState.State.Idle);
-            }
+            
 
 
 
-                var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
+            var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
             if (messageText == "Наші послуги🐣")
             {
                 _keyboardStateManager.ShowSubmenu();
