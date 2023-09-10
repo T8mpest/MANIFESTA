@@ -49,7 +49,21 @@ namespace MANIFESTA
             Console.WriteLine(ErrorMessage);
             return Task.CompletedTask;
         }
+        private static async Task BotOnMessageReceived(ITelegramBotClient botClient, Message message)
+        {
+            Console.WriteLine($"Receive message type: {message.Type}");
 
+            if (message.Type == MessageType.Contact && message.Contact != null)
+            {
+                // Получаем номер телефона из контакта
+                string phoneNumber = message.Contact.PhoneNumber;
+
+                // Отправляем номер телефона в чат
+                await botClient.SendTextMessageAsync(message.Chat.Id, $"Пользователь отправил контакт с номером телефона: {phoneNumber}");
+            }
+
+            // ... (остальной код)
+        }
         private static async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken ct)
         {
             if (update.Message is not { } message)
@@ -58,6 +72,17 @@ namespace MANIFESTA
             if (message.Text is not { } messageText)
                 return;
             var chatId = message.Chat.Id;
+            if (message.Type == MessageType.Contact && message.Contact != null)
+            {
+                // Получаем номер телефона из контакта
+                string phoneNumber = message.Contact.PhoneNumber;
+
+                // Отправляем номер телефона в чат
+                await bot.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: $"Пользователь поделился контактом с номером телефона: {phoneNumber}",
+                    cancellationToken: ct);
+            }
             if (update.Message is { Text: { } messageTextt })
             {
                 if (messageText == "Юридичні.послуги🔮")
@@ -117,33 +142,38 @@ namespace MANIFESTA
                     instagramMessageSentCount++;
                     await bot.SendPhotoAsync(update.Message.Chat.Id, InputFile.FromString("https://imgur.com/5eEglRY"), allowSendingWithoutReply: true, cancellationToken: ct);
                 }
-                else if (messageText == "Аналітика🏅")
+                else if (message.Type == MessageType.Text && message.Text == "Аналітика🏅")
                 {
-                    
-                    flag = 1;
-                    //var phoneNumber = update.Message.Contact.PhoneNumber;
-                    //await bot.SendTextMessageAsync(chatId: chatId, text: $"Пользователь поделился контактом:\nНомер телефона: {phoneNumber}");
-                   //Console.WriteLine(phoneNumber + "POSHELNAHUI");
-                    //await bot.SendTextMessageAsync(chatId: 676712896, text: $"Пользователь поделился контактом:\nНомер телефона: {phoneNumber}");
+                    // Устанавливаем состояние ожидания контакта
+                    _keyboardStateManager.SetCurrentState(BotState.State.WaitingForContact);
 
+                    // Отправляем сообщение с просьбой поделиться контактом
+                    await bot.SendTextMessageAsync(
+                        chatId: message.Chat.Id,
+                        text: "Будь ласка, поділіться своїм контактом для зв'язку:",
+                        replyMarkup: new ReplyKeyboardRemove(),
+                        cancellationToken: ct);
                 }
-                if (update.Message.Contact != null)
+                else if (message.Type == MessageType.Contact)
                 {
-                    Console.WriteLine($"Phone number: {update.Message.Contact.PhoneNumber}");
+                    // Если мы ожидаем контакт и пользователь отправил его, обработаем контакт
+                    if (_keyboardStateManager.GetCurrentState() == BotState.State.WaitingForContact)
+                    {
+                        string phoneNumber = message.Contact.PhoneNumber;
+
+                        // Отправляем номер телефона в чат
+                        await bot.SendTextMessageAsync(
+                            chatId: message.Chat.Id,
+                            text: $"Ви поділилися контактом з номером телефону: {phoneNumber}",
+                            cancellationToken: ct);
+
+                        // Сбрасываем состояние
+                        _keyboardStateManager.SetCurrentState(BotState.State.Idle);
+                    }
                 }
+
             }
-            //if (flag == 1)
-            //{
-            //    var phoneNumber = update.Message.Contact.PhoneNumber;
-            //    await bot.SendTextMessageAsync(chatId: chatId, text: $"Пользователь поделился контактом:\nНомер телефона: {phoneNumber}");
-            //    Console.WriteLine(phoneNumber + "POSHELNAHUI");
-            //    flag = 0;
-            //}
-
-            
-
-
-
+           
             var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
             if (messageText == "Наші послуги🐣")
             {
