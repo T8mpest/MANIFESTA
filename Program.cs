@@ -74,12 +74,17 @@ namespace MANIFESTA
                             }
 
                         case "Бух.Послуги🌸":
-                            await AccServ(bot, update, ct);
-                            break;
+                            {
+                                await AccServ(bot, update, ct);
+                                break;
+                            }
+
 
                         case "Управлінський облік🐍":
-                            await ManagAcc(bot, update, ct);
-                            break;
+                            {
+                                await ManagAcc(bot, update, ct);
+                                break;
+                            }
 
                         case "Аналітика🏅":
                         case "Юридичні🔮":
@@ -125,7 +130,7 @@ namespace MANIFESTA
                 {
                     case "Аналітика🏅":
                         {
-                            // Handle analytics
+                            // Handle analytics                            
                             break;
                         }
                     case "Юридичні🔮":
@@ -163,17 +168,17 @@ namespace MANIFESTA
         async Task Analytics(ITelegramBotClient telegramBotClient, long chatId, CancellationToken cancellationToken)
         {
             await telegramBotClient.SendMediaGroupAsync(
-                chatId: chatId,
-                media: new IAlbumInputMedia[]
-                {
+        chatId: chatId,
+        media: new IAlbumInputMedia[]
+        {
             new InputMediaPhoto(
                 InputFile.FromString("https://imgur.com/5VXtIcU")),
             new InputMediaPhoto(
                 InputFile.FromString("https://imgur.com/BdoOhTo")),
             new InputMediaPhoto(
                 InputFile.FromString("https://imgur.com/KqpGHDi"))
-                },
-                cancellationToken: cancellationToken);
+        },
+        cancellationToken: cancellationToken);
 
         }
 
@@ -192,15 +197,14 @@ namespace MANIFESTA
         }
 
         async Task Getphone(ITelegramBotClient telegramBotClient, Update update1, Dictionary<long, string>? dictionary, Message message1,
-            string s)
+    string s)
         {
-           // var currentKeyboard =
             await telegramBotClient.SendTextMessageAsync(update1.Message.Chat, "Введіть номер телефону",
-                replyMarkup: new ReplyKeyboardMarkup(
-                    new KeyboardButton("Поділитися номером телефону") { RequestContact = true }));
+        replyMarkup: new ReplyKeyboardMarkup(
+            new KeyboardButton("Поділитися номером телефону") { RequestContact = true }));
             dictionary[message1.From.Id] = s;
-        }
 
+        }
     }
 }
 

@@ -9,7 +9,6 @@ namespace MANIFESTA
         private ReplyKeyboardMarkup _ContactKeyboard;
         private bool _showSubmenu;
         private bool _showContactmenu;
-        private BotState.State currentState;
 
         public KeyboardStateManager()
         {
@@ -58,9 +57,8 @@ namespace MANIFESTA
 
         private ReplyKeyboardMarkup GetMainKeyboard()
         {
-
             return new ReplyKeyboardMarkup(new[]
-    {
+            {
         new[]
         {
             new KeyboardButton("Наші послуги🐣"),
@@ -68,18 +66,20 @@ namespace MANIFESTA
         new[]
         {
             new KeyboardButton("Залишити заявку☎️"),
-
         },
-    });
+    })
+            {
+                ResizeKeyboard = true
+            };
         }
         private ReplyKeyboardMarkup GetContactKeyboard()
         {
             return new ReplyKeyboardMarkup(new[]
             {
- new[]
+                new[]
         {
-           new KeyboardButton("Аналітика🏅"),
-           new KeyboardButton("Юридичні🔮"),
+            new KeyboardButton("Аналітика🏅"),
+            new KeyboardButton("Юридичні🔮"),
         },
         new[]
         {
@@ -90,12 +90,17 @@ namespace MANIFESTA
         {
             new KeyboardButton("Назад⏎"),
         },
-            }); ;
+            })
+            {
+                ResizeKeyboard = true // Добавляем ResizeKeyboard = true
+            };
+
+
         }
         private ReplyKeyboardMarkup GetSubmenuKeyboard()
         {
             return new ReplyKeyboardMarkup(new[]
-     {
+            {
         new[]
         {
             new KeyboardButton("Бізнес Аналітика🏅"),
@@ -110,8 +115,10 @@ namespace MANIFESTA
         {
             new KeyboardButton("Назад⏎"),
         },
-    });
-
+    })
+            {
+                ResizeKeyboard = true // Добавляем ResizeKeyboard = true
+            };
         }
 
     }
