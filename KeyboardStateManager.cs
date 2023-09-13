@@ -84,7 +84,7 @@ namespace MANIFESTA
         new[]
         {
             new KeyboardButton("Бухгалтерські🌸"),
-            new KeyboardButton("Управлінські🐍"), 
+            new KeyboardButton("Управлінські🐍"),
         },
         new[]
         {
@@ -113,6 +113,6 @@ namespace MANIFESTA
     });
 
         }
-       
+
     }
 }
