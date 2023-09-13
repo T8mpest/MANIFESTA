@@ -19,6 +19,7 @@ namespace MANIFESTA
         private static KeyboardStateManager _keyboardStateManager = new();
         private static int instagramMessageSentCount = 0;
         private static int flag = 0;
+        
         public async Task Run(string[] args)
         {
 
@@ -49,198 +50,173 @@ namespace MANIFESTA
             Console.WriteLine(ErrorMessage);
             return Task.CompletedTask;
         }
-        private static async Task BotOnMessageReceived(ITelegramBotClient botClient, Message message)
+
+        async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken ct)
         {
-            Console.WriteLine($"Receive message type: {message.Type}");
-
-            if (message.Type == MessageType.Contact && message.Contact != null)
-            {
-                // Получаем номер телефона из контакта
-                string phoneNumber = message.Contact.PhoneNumber;
-
-                // Отправляем номер телефона в чат
-                await botClient.SendTextMessageAsync(message.Chat.Id, $"Пользователь отправил контакт с номером телефона: {phoneNumber}");
-            }
-
-            // ... (остальной код)
-        }
-        private static async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken ct)
-        {
+            var users = new Dictionary<long, string>();
             if (update.Message is not { } message)
                 return;
-            // Only process text messages
-            if (message.Text is not { } messageText)
-                return;
-            var chatId = message.Chat.Id;
-            if (message.Type == MessageType.Contact && message.Contact != null)
-            {
-                // Получаем номер телефона из контакта
-                string phoneNumber = message.Contact.PhoneNumber;
 
-                // Отправляем номер телефона в чат
-                await bot.SendTextMessageAsync(
-                    chatId: message.Chat.Id,
-                    text: $"Пользователь поделился контактом с номером телефона: {phoneNumber}",
-                    cancellationToken: ct);
-            }
             if (update.Message is { Text: { } messageTextt })
             {
-                if (messageText == "Юридичні.послуги🔮")
+                var chatId = message.Chat.Id;
+                if (update.Message is { Text: { } messageText })
                 {
-                    // HTML-formatted text with a link to the image
-                    var legalServicesText = "<b>Юридичні послуги</b>\n" +
-                                            " <b>1. Договори, контракти: </b> розробка договорів, контрактів, зокрема ЗЕД, угод, оцінка ризиків, коригування, підготовка протоколів розбіжностей," +
-                                            "\r\nпогодження/переговори з контрагентом щодо\r\nправок.<i> \r\nУ процесі ведення господарської діяльності будь-якого підприємства виникають правовідносини з контрагентами, <b>у звʼязку з чим виникає необхідність укладання різного роду договорів, а саме:" +
-                                            "\r\n купівлі-продажу\r\nоренди, суборенди\r\n>постачання на надання послуг, виконання робіт\r\nЗЕД-контрактів\r\nдодаткових угод про зміну умов договору.</b> продовження терміну договору тощо." +
-                                            "\r\nОцінка ризиків - аналіз умов договорів щодо відповідності нормам законодавства та інтересів сторони, виявлення несприятливих умов, які можуть спричинити у себе розбіжності з контрагентом у майбутньому." +
-                                            "\r\nКоригування та підготовка протоколів розбіжностей,\r\nпогодження/переговори з контрагентом щодо правок -" +
-                                            "\r\n<b>комплекс послуг із внесення змін та правок до договорів відповідно до ваших побажань та інтересів,</b> подальше складання протоколу зі змінами та їх обговорення з контрагентом." +
-                                            "\n  </i> <b> 2. Підготовка листів, скарг, відповідей у державні органи, органи місцевого самоврядування, підприємства та організації.</b>  <i>\r\nЦей блок охоплює надання юридичних послуг у процесі комунікації з державними органами, " +
-                                            "органами місцевого самоврядування, підприємствами та організаціями, та передбачає такі послуги:\r\n﻿﻿листи, скарги, відповіді на адресу правоохоронних, податкових органів, прокуратури, інших контролюючих державних органів, банківських установ тощо;" +
-                                            "\r\n﻿﻿підготовка різного роду листів контрагентам про оплату товару або послуги, відстрочення оплати, допостачання товару, неможливість поставки або виконання зобовʼязань за договором та інших листів" +
-                                            "\r\n</i> <b>3. Розробка внутрішніх документів підприємства: накази, розпорядження, інструкції, становища; протоколи/рішення загальних зборів учасників/\r\nвищого органу (для ТОВ, ТДВ, ПП)</b>" +
-                                            "\r\n<i>Чітка та злагоджена робота підприємства багато в чому залежить від наявності коректно прописаних внутрішніх документів,<b> тому ми надаємо послуги з розробки досить великого спектру внутрішніх документів підприємства:</b>" +
-                                            "\r\n<b>﻿﻿накази:\r\n﻿﻿розпорядження;\r\n﻿﻿інструкції;\r\n﻿﻿становища;\r\n﻿﻿протоколи/рішення </b> загальних зборів учасників/ вищого органу про зміну директора, про зміну складу учасників підприємства, про доповнення або зміну переліку видів діяльності, про зміну розташування </i> " +
-                                            "\r\n<b> 4. Консультації:</b> <i> короткі та розгорнуті (юридичні\r\nвисновки).\r\nВисокий рівень теоретичних знань, підкріплених практичними навичками, дозволяє нашим спеціалістам надати консультації в багатьох сферах діяльності в різних формах:" +
-                                            "\r\n﻿﻿короткі консультації щодо окремо взятої ситуації;\r\n﻿﻿розгорнуті (юридичні укладання), що стосуються низки питань діяльності підприємства чи проекту." +
-                                            "\r\n</i> <b>5. Претензійно-позовна робота: підготовка вимог/ претензій щодо оплати заборгованості</b>;<i> підготовка позовів, процесуальних документів, супроводження\r\nвиконавчого провадження" +
-                                            "\r\n</i> <b>Захист прав та інтересів підприємства нерідко призводить до необхідності звернення до органів судової влади, наша компанія допоможе</b> підготовці різноманітних документів:" +
-                                            "\r\n﻿﻿підготовка досудових вимог/претензій щодо оплати заборгованості, вимог виконання зобовʼязань контрагента згідно з договором;\r\n﻿﻿підготовка позовів про стягнення заборгованості, визнання неправомірними дій державних органів та Ін.;" +
-                                            "\r\n﻿﻿підготовка процесуальних документів: відгуків, відповідей на відгук, клопотань, заяв, скарг;\r\n﻿﻿супровід виконавчого провадження: підготовка заяв про примусове виконання рішення, листів до органів виконавчої служби,\n" +
-                                            "<a href=\"https://manifesta.com.ua/\">Наш сайт</a>";
-
-                    // Send the formatted text message with HTML parse mode
-                    await bot.SendTextMessageAsync(update.Message.Chat.Id, legalServicesText, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, cancellationToken: ct);
-                    instagramMessageSentCount++;
-                }
-                else if (messageText == "Бізнес Аналітика🏅")
-                {
-                    var legalServicesText = "<b>Бізнес Аналітика</b>\n" + // условно
-                                            " НАЛАГОДЖЕННЯ ТА РОЗРОБКА BAS ";
-                    await bot.SendMediaGroupAsync(
-                     chatId: chatId,
-                      media: new IAlbumInputMedia[]
-                      {
-                          new InputMediaPhoto(
-                            InputFile.FromString("https://imgur.com/5VXtIcU")),
-                           new InputMediaPhoto(
-                             InputFile.FromString("https://imgur.com/BdoOhTo")),
-                           new InputMediaPhoto(
-                               InputFile.FromString("https://imgur.com/KqpGHDi"))
-                      },
-                            cancellationToken: ct);
-                    instagramMessageSentCount++;
-                    //await bot.SendPhotoAsync(update.Message.Chat.Id,InputFile.FromString("https://imgur.com/a/52f6Qkn"), allowSendingWithoutReply: true, cancellationToken: ct);
-                }
-                else if (messageText == "Бух.Послуги🌸")
-                {
-                    instagramMessageSentCount++;
-                    await bot.SendPhotoAsync(update.Message.Chat.Id, InputFile.FromString("https://imgur.com/TtZMndX"), allowSendingWithoutReply: true, cancellationToken: ct);
-                }
-                else if (messageText == "Управлінський облік🐍")
-                {
-                    instagramMessageSentCount++;
-                    await bot.SendPhotoAsync(update.Message.Chat.Id, InputFile.FromString("https://imgur.com/5eEglRY"), allowSendingWithoutReply: true, cancellationToken: ct);
-                }
-                else if (message.Type == MessageType.Text && message.Text == "Аналітика🏅")
-                {
-                    // Устанавливаем состояние ожидания контакта
-                    _keyboardStateManager.SetCurrentState(BotState.State.WaitingForContact);
-
-                    // Отправляем сообщение с просьбой поделиться контактом
-                    await bot.SendTextMessageAsync(
-                        chatId: message.Chat.Id,
-                        text: "Будь ласка, поділіться своїм контактом для зв'язку:",
-                        replyMarkup: new ReplyKeyboardRemove(),
-                        cancellationToken: ct);
-                }
-                else if (message.Type == MessageType.Contact)
-                {
-                    // Если мы ожидаем контакт и пользователь отправил его, обработаем контакт
-                    if (_keyboardStateManager.GetCurrentState() == BotState.State.WaitingForContact)
+                    switch (messageText)
                     {
-                        string phoneNumber = message.Contact.PhoneNumber;
+                        case "Юридичні.послуги🔮":
+                            {
+                                await LegalServ(bot, update, ct);
+                                break;
+                            }
 
-                        // Отправляем номер телефона в чат
-                        await bot.SendTextMessageAsync(
-                            chatId: message.Chat.Id,
-                            text: $"Ви поділилися контактом з номером телефону: {phoneNumber}",
-                            cancellationToken: ct);
+                        case "Бізнес Аналітика🏅":
+                            {
+                                await Analytics(bot, chatId, ct);
+                                break;
+                            }
 
-                        // Сбрасываем состояние
-                        _keyboardStateManager.SetCurrentState(BotState.State.Idle);
+                        case "Бух.Послуги🌸":
+                            await AccServ(bot, update, ct);
+                            break;
+
+                        case "Управлінський облік🐍":
+                            await ManagAcc(bot, update, ct);
+                            break;
+
+                        case "Аналітика🏅":
+                        case "Юридичні🔮":
+                        case "Бухгалтерські🌸":
+                        case "Управлінські🐍":
+                            await Getphone(bot, update, users, message, messageText);
+                            break;
                     }
+
+                    var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
+                    switch (messageText)
+                    {
+                        case "Наші послуги🐣":
+                            _keyboardStateManager.ShowSubmenu();
+                            currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
+                            break;
+                        case "Назад⏎":
+                            _keyboardStateManager.HideSubmenu();
+                            currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
+                            instagramMessageSentCount++;
+                            break;
+                        case "Залишити заявку☎️":
+                            _keyboardStateManager.ShowContactmenu();
+                            currentKeyboard = _keyboardStateManager.GetContactKeyboard2();
+                            await bot.SendTextMessageAsync(update.Message.Chat.Id, "Натисніть кнопку щоб поділитися контактом");
+                            break;
+                    }
+
+                    _ = await bot.SendTextMessageAsync(
+                        chatId: chatId,
+                        text: "Оберіть що вас цікавить",
+                        replyMarkup: currentKeyboard,
+                        cancellationToken: ct);
+
+                    Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
+                }
+            }
+            else if (update.Message is { Contact: { } contact })
+            {
+                string phone = contact.PhoneNumber;
+                string action = users[update.Message.From.Id];
+
+                switch (action)
+                {
+                    case "Аналітика🏅":
+                        {
+                            // Handle analytics
+                            break;
+                        }
+                    case "Юридичні🔮":
+                        {
+                            // Handle analytics
+                            break;
+                        }
+                    case "Бухгалтерські\ud83c\udf38":
+                        {
+                            // Handle analytics
+                            break;
+                        }
+                    case "Управлінські🐍":
+                        {
+                            // Handle analytics
+                            break;
+                        }
                 }
 
+                Console.WriteLine($"{phone}");
+                Console.WriteLine("UKRAINE");
             }
-           
-            var currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
-            if (messageText == "Наші послуги🐣")
-            {
-                _keyboardStateManager.ShowSubmenu();
-                currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
-            }
-            else if (messageText == "Назад⏎")
-            {
-                _keyboardStateManager.HideSubmenu();
-                currentKeyboard = _keyboardStateManager.GetCurrentKeyboard();
-                instagramMessageSentCount++;
-            }
-            else if (messageText == "Залишити заявку☎️")
-            {
-                _keyboardStateManager.ShowContactmenu();
-                currentKeyboard = _keyboardStateManager.GetContactKeyboard2();
-                await bot.SendTextMessageAsync(update.Message.Chat.Id, "Натисніть кнопку щоб поділитися контактом");
-            }
-            Message sentMessaage = await bot.SendTextMessageAsync(
-            chatId: chatId,
-            text: "Оберіть що вас цікавить",
-            replyMarkup: currentKeyboard,
-            cancellationToken: ct);
+        }
 
-            Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
+        async Task LegalServ(ITelegramBotClient bot, Update update, CancellationToken ct)
+        {
+            // HTML-formatted text with a link to the image
+            var legalServicesText = "some message";
 
-            if (instagramMessageSentCount <= 1)
-            {
+            // Send the formatted text message with HTML parse mode
+            await bot.SendTextMessageAsync(update.Message.Chat.Id, legalServicesText,
+                parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, cancellationToken: ct);
+            instagramMessageSentCount++;
+        }
 
-                InlineKeyboardMarkup inlineKeyboard = new(new[]
+        async Task Analytics(ITelegramBotClient telegramBotClient, long chatId, CancellationToken cancellationToken)
+        {
+            await telegramBotClient.SendMediaGroupAsync(
+                chatId: chatId,
+                media: new IAlbumInputMedia[]
                 {
-                InlineKeyboardButton.WithUrl(
-                    text: "Check our Inst:",
-                    url: "https://www.instagram.com/manifesta_consult/")
-            });
+            new InputMediaPhoto(
+                InputFile.FromString("https://imgur.com/5VXtIcU")),
+            new InputMediaPhoto(
+                InputFile.FromString("https://imgur.com/BdoOhTo")),
+            new InputMediaPhoto(
+                InputFile.FromString("https://imgur.com/KqpGHDi"))
+                },
+                cancellationToken: cancellationToken);
+            instagramMessageSentCount++;
+            
+        }
 
-                Message sentMessage = await bot.SendTextMessageAsync(
-                    chatId: chatId,
-                    text: "Ще більше інформації:",
-                    replyMarkup: inlineKeyboard,
-                    cancellationToken: ct);
-                instagramMessageSentCount++;
-            }
-            else if (instagramMessageSentCount == 4)
-            {
-                InlineKeyboardMarkup inlineKeyboard = new(new[]
-                {
-                InlineKeyboardButton.WithUrl(
-                    text: "Check our Inst:",
-                    url: "https://www.instagram.com/manifesta_consult/")
-            });
+        async Task AccServ(ITelegramBotClient telegramBotClient, Update update1, CancellationToken cancellationToken)
+        {
+            instagramMessageSentCount++;
+            await telegramBotClient.SendPhotoAsync(update1.Message.Chat.Id, InputFile.FromString("https://imgur.com/TtZMndX"),
+                allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+        }
 
-                Message sentMessage = await bot.SendTextMessageAsync(
-                    chatId: chatId,
-                    text: "Ще більше інформації:",
-                    replyMarkup: inlineKeyboard,
-                    cancellationToken: ct);
-                instagramMessageSentCount++;
-            }
+        async Task ManagAcc(ITelegramBotClient telegramBotClient, Update update1, CancellationToken cancellationToken)
+        {
+            instagramMessageSentCount++;
+            await telegramBotClient.SendPhotoAsync(update1.Message.Chat.Id, InputFile.FromString("https://imgur.com/5eEglRY"),
+                allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+        }
 
-
+        async Task Getphone(ITelegramBotClient telegramBotClient, Update update1, Dictionary<long, string>? dictionary, Message message1,
+            string s)
+        {
+            await telegramBotClient.SendTextMessageAsync(update1.Message.Chat, "Введіть номер телефону",
+                replyMarkup: new ReplyKeyboardMarkup(
+                    new KeyboardButton("Поділитися номером телефону") { RequestContact = true }));
+            dictionary[message1.From.Id] = s;
         }
 
 
+                    
 
-    }
-}
+                
+            }
+
+
+
+        }
+    
+
 
 
 

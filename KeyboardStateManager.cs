@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.Bot;
-using System.Net.Http.Headers;
+﻿using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MANIFESTA
 {
@@ -17,16 +10,6 @@ namespace MANIFESTA
         private bool _showSubmenu;
         private bool _showContactmenu;
         private BotState.State currentState;
-
-        public void SetCurrentState(BotState.State state)
-        {
-            currentState = state;
-        }
-
-        public BotState.State GetCurrentState()
-        {
-            return currentState;
-        }
 
         public KeyboardStateManager()
         {
@@ -80,11 +63,11 @@ namespace MANIFESTA
     {
         new[]
         {
-            new KeyboardButton("Наші послуги🐣") { RequestContact = false },
+            new KeyboardButton("Наші послуги🐣"),
         },
         new[]
         {
-            new KeyboardButton("Залишити заявку☎️") { RequestContact = false },
+            new KeyboardButton("Залишити заявку☎️"),
 
         },
     });
@@ -95,19 +78,19 @@ namespace MANIFESTA
             {
  new[]
         {
-            new KeyboardButton("Аналітика🏅") { RequestContact = true },
-            new KeyboardButton("Юридичні🔮") { RequestContact = true },
+           new KeyboardButton("Аналітика🏅"),
+           new KeyboardButton("Юридичні🔮"),
         },
         new[]
         {
-            new KeyboardButton("Бухгалтерські🌸") { RequestContact = true },
-            new KeyboardButton("Управлінські🐍") { RequestContact = true },
+            new KeyboardButton("Бухгалтерські🌸"),
+            new KeyboardButton("Управлінські🐍"), 
         },
         new[]
         {
-            new KeyboardButton("Назад⏎") { RequestContact = false },
+            new KeyboardButton("Назад⏎"),
         },
-            });;
+            }); ;
         }
         private ReplyKeyboardMarkup GetSubmenuKeyboard()
         {
@@ -115,20 +98,21 @@ namespace MANIFESTA
      {
         new[]
         {
-            new KeyboardButton("Бізнес Аналітика🏅") { RequestContact = false },
-            new KeyboardButton("Юридичні.послуги🔮") { RequestContact = false },
+            new KeyboardButton("Бізнес Аналітика🏅"),
+            new KeyboardButton("Юридичні.послуги🔮"),
         },
         new[]
         {
-            new KeyboardButton("Бух.Послуги🌸") { RequestContact = false },
-            new KeyboardButton("Управлінський облік🐍") { RequestContact = false },
+            new KeyboardButton("Бух.Послуги🌸"),
+            new KeyboardButton("Управлінський облік🐍"),
         },
         new[]
         {
-            new KeyboardButton("Назад⏎") { RequestContact = false },
+            new KeyboardButton("Назад⏎"),
         },
     });
 
         }
+       
     }
 }
