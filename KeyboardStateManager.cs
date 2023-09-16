@@ -92,7 +92,7 @@ namespace MANIFESTA
         },
             })
             {
-                ResizeKeyboard = true // Добавляем ResizeKeyboard = true
+                ResizeKeyboard = true 
             };
 
 
