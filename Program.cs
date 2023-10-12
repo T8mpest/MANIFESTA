@@ -118,7 +118,8 @@ internal class Program
             switch (currentStatus)
             {
                 case "Аналітика🏅":
-                    {                        
+                    {
+                         await bot.SendTextMessageAsync(chatId: 1424766439, $"Номер телефону: {Phone},\n Ім'я: {FirstName}, Прізвище: {LastName}\n Зацікавлен у послугах аналітики.", cancellationToken: ct);
                         break;
                     }
 
@@ -189,7 +190,7 @@ internal class Program
 
     static async Task GetPhone(ITelegramBotClient telegramBotClient, long userId, string newStatus)
     {
-        await telegramBotClient.SendTextMessageAsync(userId, "Введіть номер телефону",
+        await telegramBotClient.SendTextMessageAsync(userId, "Натисніть на кнопку",
             replyMarkup: Keyboards.GetContactKeyboard);
         _users[userId] = newStatus;
     }
