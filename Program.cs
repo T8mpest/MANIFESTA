@@ -8,11 +8,12 @@ using Telegram.Bot;
 
 internal class Program
 {
-    //private readonly ITelegramBotClient _botClient = new TelegramBotClient("6558637896:AAFn-y5PLNvv_BfQhJEyhEWOPGItg3GCBX4");
+    // Creating dictionary for users
     private static readonly Dictionary<long, string> _users = new();
 
     public static async Task Main(string[] args)
     {
+        // Start for bot
         var botClient = new TelegramBotClient("6558637896:AAFn-y5PLNvv_BfQhJEyhEWOPGItg3GCBX4");
         var me = await botClient.GetMeAsync();
         ReceiverOptions receiverOptions = new()
@@ -31,6 +32,7 @@ internal class Program
 
     static Task HandlePollingErrorAsync(ITelegramBotClient client, Exception ex, CancellationToken token)
     {
+        // Default ErrorHandler for tg bots
         var ErrorMessage = ex switch
         {
             ApiRequestException apiRequestException
@@ -55,6 +57,7 @@ internal class Program
         {
             switch (messageText)
             {
+                //info when buttons click
                 case "Юридичні.послуги🔮":
                     {
                         await LegalServ(bot, userId, ct);
@@ -78,7 +81,7 @@ internal class Program
                         await ManagAcc(bot, userId, ct);
                         return;
                     }
-
+                    // switch case for buttons to call method GetPhone
                 case "Аналітика🏅":
                 case "Юридичні🔮":
                 case "Бухгалтерські🌸":
@@ -88,6 +91,7 @@ internal class Program
             }
 
             IReplyMarkup newKeyboard;
+            // switch case for actions if buttons click
             switch (messageText)
             {
                 case "Наші послуги🐣":
@@ -112,6 +116,7 @@ internal class Program
         }
         else if (update.Message is { Contact: { } contact })
         {
+            // creating string for save the info from contact
             string Phone = contact.PhoneNumber;
             string FirstName = contact.FirstName; 
             string LastName = contact.LastName;
@@ -159,6 +164,7 @@ internal class Program
 
     static async Task Analytics(ITelegramBotClient telegramBotClient, long userId, CancellationToken cancellationToken)
     {
+        // task for Analytics Button
         await telegramBotClient.SendMediaGroupAsync(
             chatId: userId,
             media: new IAlbumInputMedia[]
@@ -175,6 +181,7 @@ internal class Program
 
     static async Task AccServ(ITelegramBotClient telegramBotClient, long userId, CancellationToken cancellationToken)
     {
+        // task for AccServ Button
         await telegramBotClient.SendPhotoAsync(userId,
             InputFile.FromString("https://imgur.com/TtZMndX"),
             allowSendingWithoutReply: true, cancellationToken: cancellationToken);
@@ -182,6 +189,7 @@ internal class Program
 
     static async Task ManagAcc(ITelegramBotClient telegramBotClient, long userId, CancellationToken cancellationToken)
     {
+        // task for ManagAcc Button
         await telegramBotClient.SendPhotoAsync(userId,
             InputFile.FromString("https://imgur.com/5eEglRY"),
             allowSendingWithoutReply: true, cancellationToken: cancellationToken);
@@ -190,6 +198,7 @@ internal class Program
 
     static async Task GetPhone(ITelegramBotClient telegramBotClient, long userId, string newStatus)
     {
+        // task for Get phone from contact using GetContactKeyboard + add usedId in dictionary
         await telegramBotClient.SendTextMessageAsync(userId, "Натисніть на кнопку",
             replyMarkup: Keyboards.GetContactKeyboard);
         _users[userId] = newStatus;

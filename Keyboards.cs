@@ -4,6 +4,7 @@ namespace MANIFESTA
 {
     public static class Keyboards
     {
+        // method for Get Main keyboard
         public static ReplyKeyboardMarkup GetMainKeyboard
         {
             get
@@ -24,7 +25,7 @@ namespace MANIFESTA
                 };
             }
         }
-
+        // Method to click on button for share the contact + button back in menu
         public static ReplyKeyboardMarkup GetProductsKeyboard
         {
             get
@@ -51,7 +52,7 @@ namespace MANIFESTA
                 };
             }
         }
-
+        // Method with all info buttons + button back in menu
         public static ReplyKeyboardMarkup GetSubmenuKeyboard
         {
             get
@@ -78,7 +79,7 @@ namespace MANIFESTA
                 };
             }
         }
-
+        // The method for get new button and share contact and we can handle it
         public static ReplyKeyboardMarkup GetContactKeyboard
         {
             get
