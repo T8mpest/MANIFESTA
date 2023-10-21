@@ -14,7 +14,7 @@ internal class Program
     public static async Task Main(string[] args)
     {
         // Start for bot
-        var botClient = new TelegramBotClient("6558637896:AAFn-y5PLNvv_BfQhJEyhEWOPGItg3GCBX4");
+        var botClient = new TelegramBotClient("YOUR API TOKEN");
         var me = await botClient.GetMeAsync();
         ReceiverOptions receiverOptions = new()
         {
@@ -130,19 +130,19 @@ internal class Program
 
                 case "Юридичні🔮":
                     {
-                        // Handle analytics
+                        await bot.SendTextMessageAsync(chatId: 1823796239, $"Номер телефону: {Phone},\n Ім'я: {FirstName}, Прізвище: {LastName}\n Зацікавлен у Юридичних послугах.", cancellationToken: ct);
                         break;
                     }
 
                 case "Бухгалтерські🌸":
                     {
-                        // Handle analytics
+                        await bot.SendTextMessageAsync(chatId: 1523756439, $"Номер телефону: {Phone},\n Ім'я: {FirstName}, Прізвище: {LastName}\n Зацікавлен у Бухгалтерськіх послугах.", cancellationToken: ct);
                         break;
                     }
 
                 case "Управлінські🐍":
                     {
-                        // Handle analytics
+                        await bot.SendTextMessageAsync(chatId: 1422116439, $"Номер телефону: {Phone},\n Ім'я: {FirstName}, Прізвище: {LastName}\n Зацікавлен у послугах управління.", cancellationToken: ct);
                         break;
                     }
             }
